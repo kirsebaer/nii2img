@@ -23,7 +23,7 @@ def parse_params(argv, params):
     print args
     if len(args) == 1:
       params['nii_filename'] = args[0]
-    else
+    else:
       raise
   except:
     print "error"
@@ -31,35 +31,43 @@ def parse_params(argv, params):
   
   for opt,arg in opts:
       if opt in ("-s", "--start_slice"):
-        params['start_slice'] = arg 
-      else if opt in ("-e", "--end_slice"):
-        params['end_slice'] = arg
-      else if opt in ("-a", "--alternate_slice"):
-        params['alternate_slice'] = arg
-      else if opt in ("-o", "--output_prefix"):
+        params['start_slice'] = int(arg) 
+      elif opt in ("-e", "--end_slice"):
+        params['end_slice'] = int(arg)
+      elif opt in ("-a", "--alternate_slice"):
+        params['alternate_slice'] = int(arg)
+      elif opt in ("-o", "--output_prefix"):
         params['output_prefix'] = arg
+        
 
 # load nifti file according to parameters above
-def load_nii():
-  pass
+def load_nii(params):
+  img = nib.load(params['nii_filename'])
+  data = img.get_data()
+  return data
 
 # normalize the color value range in the original nii image
 def normalize_nii():
   pass
 
 # extract the images from the file you wish to continue with a.s.o.
-def extract_img():
-  pass
-  
-
+def extract_img(params, data):
+  counter = 0
+  for i in range(0, data.shape[2]):
+    if (i % params['alternate_slice']) == 0:
+      slice = numpy.rot90(data[:,:,i])
+      image_name = params['output_prefix'] + str(counter) + ".png"
+      scipy.misc.imsave(image_name, slice)
+      counter = counter + 1
+      
 if __name__ == '__main__':
   parse_params(sys.argv[1:], params)
-
-
+  data = load_nii(params)
+  extract_img(params, data)
 
 #~ img = nib.load(nifti_filename)
 #~ hdr =  img.get_header()
 #~ data = img.get_data()
-#~ 
+#~ data.shape # gives you the three dimension values
 #~ slice = numpy.rot90(data[:,:,150])
-#~ scipy.misc.imsave('test150.png',slice)
+#~ scipy.misc.imsave('test150.png', slice)
