@@ -23,13 +23,12 @@ def parse_params(argv, params):
         short_opts = "s:e:a:o:v"
         long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "output_prefix="]
         opts, args = getopt.getopt(argv, short_opts, long_opts)
-        print args
         if len(args) == 1:
             params['nii_filename'] = args[0]
         else:
             raise
     except:
-        print "error"
+        print "Error! Invalid option(s)."
         sys.exit(2)
 
     for opt, arg in opts:
