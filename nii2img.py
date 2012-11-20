@@ -7,6 +7,7 @@ import numpy
 import scipy
 
 # params is the dictionary holding all needed parameters for the script
+# think about adding an -m option for introducing a mask
 params = {
   'nii_filename': "",
   'start_slice': 0,
@@ -50,10 +51,11 @@ def load_nii(params):
 def normalize_nii():
   pass
 
-# extract the images from the file you wish to continue with a.s.o.
+# extract the images from the file you wish to continue with, alternation, start and end slice
 def extract_img(params, data):
   counter = 0
-  for i in range(0, data.shape[2]):
+  end_slice = params['end_slice'] or data.shape[2]
+  for i in range(params['start_slice'], end_slice):
     if (i % params['alternate_slice']) == 0:
       slice = numpy.rot90(data[:,:,i])
       image_name = params['output_prefix'] + str(counter) + ".png"
