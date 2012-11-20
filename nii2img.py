@@ -57,8 +57,11 @@ def normalize_nii():
 # extract the images from the file you wish to continue with, alternation, start and end slice
 def extract_img(params, data):
     counter = 0
+    start_slice = params['start_slice'] or 0
+    start_slice = start_slice - 1 if start_slice > 0 else start_slice
     end_slice = params['end_slice'] or data.shape[2]
-    for i in range(params['start_slice'], end_slice):
+    data = data[:, :, range(start_slice, end_slice)]
+    for i in range(0, data.shape[2]):
         if (i % params['alternate_slice']) == 0:
             slice = numpy.rot90(data[:, :, i])
             image_name = params['output_prefix'] + str(counter) + ".png"
