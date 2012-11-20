@@ -76,7 +76,7 @@ def extract_img(params, data):
             slice = numpy.rot90(data[:, :, i])
             image_name = params['output_prefix'] + str(counter) + ".png"
             scipy.misc.imsave(image_name, slice)
-            counter = counter + 1
+            counter += 1
             if params['verbose']:
                 sys.stdout.write(".")
                 sys.stdout.flush()
