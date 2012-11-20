@@ -13,13 +13,14 @@ params = {
     'start_slice': 0,
     'end_slice': None,
     'alternate_slice': 1,
-    'output_prefix': "img"
+    'output_prefix': "img",
+    'verbose': False
 }
 
 
 def parse_params(argv, params):
     try:
-        short_opts = "s:e:a:o:"
+        short_opts = "s:e:a:o:v"
         long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "output_prefix="]
         opts, args = getopt.getopt(argv, short_opts, long_opts)
         print args
@@ -40,22 +41,31 @@ def parse_params(argv, params):
             params['alternate_slice'] = int(arg)
         elif opt in ("-o", "--output_prefix"):
             params['output_prefix'] = arg
+        elif opt in ("-v", "--verbose"):
+            params['verbose'] = True
 
 
 # load nifti file according to parameters above
 def load_nii(params):
+    if params['verbose']:
+        print "Loading NIfTI file"
+
     img = nib.load(params['nii_filename'])
     data = img.get_data()
     return data
 
 
 # normalize the color value range in the original nii image
-def normalize_nii():
-    pass
+def normalize_nii(params, data):
+    if params['verbose']:
+        print "Normalizing intensities"
 
 
 # extract the images from the file you wish to continue with, alternation, start and end slice
 def extract_img(params, data):
+    if params['verbose']:
+        print "Extracting images"
+
     counter = 0
     start_slice = params['start_slice'] or 0
     start_slice = start_slice - 1 if start_slice > 0 else start_slice
@@ -67,15 +77,18 @@ def extract_img(params, data):
             image_name = params['output_prefix'] + str(counter) + ".png"
             scipy.misc.imsave(image_name, slice)
             counter = counter + 1
+            if params['verbose']:
+                sys.stdout.write(".")
+                sys.stdout.flush()
+
+    if params['verbose']:
+        print ""
+
 
 if __name__ == '__main__':
     parse_params(sys.argv[1:], params)
     data = load_nii(params)
+    normalize_nii(params, data)
     extract_img(params, data)
-
-#~ img = nib.load(nifti_filename)
-#~ hdr =  img.get_header()
-#~ data = img.get_data()
-#~ data.shape # gives you the three dimension values
-#~ slice = numpy.rot90(data[:,:,150])
-#~ scipy.misc.imsave('test150.png', slice)
+    if params['verbose']:
+        print "Finished"
