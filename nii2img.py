@@ -65,20 +65,21 @@ def extract_img(params, data):
     if params['verbose']:
         print "Extracting images"
 
-    counter = 0
+    image_counter = 0
+    slice_counter = 0
     start_slice = params['start_slice'] or 0
     start_slice = start_slice - 1 if start_slice > 0 else start_slice
     end_slice = params['end_slice'] or data.shape[2]
-    data = data[:, :, range(start_slice, end_slice)]
-    for i in range(0, data.shape[2]):
-        if (i % params['alternate_slice']) == 0:
+    for i in range(start_slice, end_slice):
+        if (slice_counter % params['alternate_slice']) == 0:
             slice = numpy.rot90(data[:, :, i])
-            image_name = params['output_prefix'] + str(counter) + ".png"
+            image_name = params['output_prefix'] + str(image_counter) + ".png"
             scipy.misc.imsave(image_name, slice)
-            counter += 1
+            image_counter += 1
             if params['verbose']:
                 sys.stdout.write(".")
                 sys.stdout.flush()
+        slice_counter += 1
 
     if params['verbose']:
         print ""
