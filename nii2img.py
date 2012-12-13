@@ -20,6 +20,10 @@ params = {
 
 
 def parse_params(argv, params):
+    if not argv:
+        print_help()
+        sys.exit(0)
+
     try:
         short_opts = "s:e:a:p:o:vh"
         long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "plane=", "output_prefix=", "verbose", "help"]
