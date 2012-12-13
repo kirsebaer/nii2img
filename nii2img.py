@@ -15,6 +15,7 @@ params = {
     'alternate_slice': 1,
     'plane': "ax",
     'output_prefix': "img",
+    'format': "png",
     'verbose': False
 }
 
@@ -25,8 +26,8 @@ def parse_params(argv, params):
         sys.exit(0)
 
     try:
-        short_opts = "s:e:a:p:o:vh"
-        long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "plane=", "output_prefix=", "verbose", "help"]
+        short_opts = "s:e:a:p:o:f:vh"
+        long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "plane=", "output_prefix=", "format=", "verbose", "help"]
         opts, args = getopt.getopt(argv, short_opts, long_opts)
         if len(args) == 1:
             params['nii_filename'] = args[0]
@@ -50,6 +51,8 @@ def parse_params(argv, params):
             params['output_prefix'] = arg
         elif opt in ("-v", "--verbose"):
             params['verbose'] = True
+        elif opt in ("-f", "--format"):
+            params['format'] = arg
         elif opt in ("-h", "--help"):
             print_help()
             sys.exit(0)
@@ -65,6 +68,7 @@ def print_help():
     print "-a, --alternate_slice"
     print "-p, --plane : extract images in axial (ax), coronar (cor) or sagittal (sag) plane"
     print "-o, --output_prefix"
+    print "-f, --format : output format (png by default); png, jpg, bmp"
     print "-v, --verbose"
     print "-h, --help"
     print ""
@@ -111,7 +115,7 @@ def extract_img(params, data):
 
             slice = numpy.rot90(slice)
 
-            image_name = params['output_prefix'] + str(image_counter) + ".png"
+            image_name = params['output_prefix'] + str(image_counter) + "." + params['format']
             scipy.misc.imsave(image_name, slice)
             image_counter += 1
             if params['verbose']:
