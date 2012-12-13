@@ -21,13 +21,14 @@ params = {
 
 def parse_params(argv, params):
     try:
-        short_opts = "s:e:a:p:o:v"
-        long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "plane=", "output_prefix="]
+        short_opts = "s:e:a:p:o:vh"
+        long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "plane=", "output_prefix=", "verbose", "help"]
         opts, args = getopt.getopt(argv, short_opts, long_opts)
         if len(args) == 1:
             params['nii_filename'] = args[0]
-        else:
+        elif len(args) > 1:
             raise
+
     except:
         print "Error! Invalid option(s)."
         sys.exit(2)
@@ -45,10 +46,32 @@ def parse_params(argv, params):
             params['output_prefix'] = arg
         elif opt in ("-v", "--verbose"):
             params['verbose'] = True
+        elif opt in ("-h", "--help"):
+            print_help()
+            sys.exit(0)
+
+
+def print_help():
+    print ""
+    print "nii2img.py [OPTION] [NIFTI_INPUT_FILE]"
+    print "The NIFTI_INPUT_FILE must be in LAS orientation!"
+    print "Available command line options:"
+    print "-s, --start_slice"
+    print "-e, --end_slice"
+    print "-a, --alternate_slice"
+    print "-p, --plane : extract images in axial (ax), coronar (cor) or sagittal (sag) plane"
+    print "-o, --output_prefix"
+    print "-v, --verbose"
+    print "-h, --help"
+    print ""
 
 
 # load nifti file according to parameters above
 def load_nii(params):
+    if not params['nii_filename']:
+        print "Error! Missing NIFTI input file."
+        sys.exit(2)
+
     if params['verbose']:
         print "Loading NIfTI file"
 
