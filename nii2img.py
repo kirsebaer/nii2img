@@ -13,6 +13,7 @@ params = {
     'start_slice': 0,
     'end_slice': None,
     'alternate_slice': 1,
+    'plane': "ax",
     'output_prefix': "img",
     'verbose': False
 }
@@ -20,8 +21,8 @@ params = {
 
 def parse_params(argv, params):
     try:
-        short_opts = "s:e:a:o:v"
-        long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "output_prefix="]
+        short_opts = "s:e:a:p:o:v"
+        long_opts = ["start_slice=", "end_slice=", "alternate_slice=", "plane=", "output_prefix="]
         opts, args = getopt.getopt(argv, short_opts, long_opts)
         if len(args) == 1:
             params['nii_filename'] = args[0]
@@ -38,6 +39,8 @@ def parse_params(argv, params):
             params['end_slice'] = int(arg)
         elif opt in ("-a", "--alternate_slice"):
             params['alternate_slice'] = int(arg)
+        elif opt in ("-p", "--plane'"):
+            params['plane'] = arg
         elif opt in ("-o", "--output_prefix"):
             params['output_prefix'] = arg
         elif opt in ("-v", "--verbose"):
@@ -72,7 +75,15 @@ def extract_img(params, data):
     end_slice = params['end_slice'] or data.shape[2]
     for i in range(start_slice, end_slice):
         if (slice_counter % params['alternate_slice']) == 0:
-            slice = numpy.rot90(data[:, :, i])
+            if params['plane'] == "ax":
+                slice = data[:, :, i]
+            elif params['plane'] == "cor":
+                slice = data[:, i, :]
+            elif params['plane'] == "sag":
+                slice = data[i, :, :]
+
+            slice = numpy.rot90(slice)
+
             image_name = params['output_prefix'] + str(image_counter) + ".png"
             scipy.misc.imsave(image_name, slice)
             image_counter += 1
